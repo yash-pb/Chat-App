@@ -1,7 +1,7 @@
 
 <template>
     <div>
-        <div class="px-3 py-3 lg:pl-[20rem] w-full overflow-auto">
+        <div class="p-3 w-full overflow-auto">
             <div class="hidden items-center justify-center w-full h-[100vh]">
                 <div class="flex justify-center items-center space-x-1 text-sm text-gray-700">
                             <svg fill='none' class="w-6 h-6 animate-spin" viewBox="0 0 32 32" xmlns='http://www.w3.org/2000/svg'>
@@ -12,11 +12,13 @@
                     <div>Loading ...</div>
                 </div>
             </div>
-            Layout
+            {{ userStore.user.name }}
             <router-view />
         </div>
     </div>
 </template>
 <script setup>
-    console.log('layout');
+import { useUserStore } from "../../stores/user";
+const userStore = useUserStore();
+console.log('layout');
 </script>
