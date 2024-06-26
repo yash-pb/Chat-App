@@ -12,13 +12,10 @@
                     <div>Loading ...</div>
                 </div>
             </div>
-            {{ userStore.user.name }}
             <router-view />
         </div>
     </div>
 </template>
 <script setup>
-import { useUserStore } from "../../stores/user";
-const userStore = useUserStore();
 console.log('layout');
 </script>
