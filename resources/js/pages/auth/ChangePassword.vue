@@ -48,10 +48,8 @@ export default {
     },
     methods: {
         async updatePass() {
-            // console.log(this.credentials);
             axios.post(`change-password/${this.token}`, this.credentials)
             .then(response => {
-                console.log('response => ', response);
                 if(response.status === 200) {
                     this.$router.push({ name: 'login' });
                 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\MessageSent;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,6 +16,11 @@ use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
 //     return view('welcome');
+// });
+// Route::get('hit', function () {
+//     // broadcast(new MessageSent('Hey From web'))->toOthers();
+//     // event(new MessageSent('sdsssfs'));
+//     dd(broadcast(new MessageSent('Hey From web'))->toOthers());
 // });
 
 Route::get('/{any?}', function () {

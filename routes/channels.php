@@ -14,15 +14,17 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
-});
+// Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
+//     return (int) $user->id === (int) $id;
+// });
 
 
 // routes/channels.php
 
-Broadcast::channel('chat', function ($user) {
-    dd($user);
-    return Auth::check();
+Broadcast::channel('chat', function ($user, $roomId) {
+  // if($roomId) {
+  //   // return Auth::check();
+  // }
+  return true;
+    // dd($user);
   });
-  

@@ -1,7 +1,7 @@
 <template>
     <div class="w-1/4 bg-gray-900 text-white flex flex-col">
       <div class="p-4 flex items-center justify-between bg-gray-800">
-        <h1 class="text-xl font-bold">Contacts</h1>
+        <h1 class="text-xl font-bold">{{ userStore.user.name }}</h1>
         <button class="text-gray-400 hover:text-white">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -22,9 +22,11 @@
   
   <script setup>
   import { ref } from 'vue';
+  import { useUserStore } from "../stores/user";
 
   const props = defineProps(['friends']);
   const emits = defineEmits(['openUserChatWindow']);
+  const userStore = useUserStore();
   
   const openUserChat = (friendId) => {
     emits('openUserChatWindow', friendId);
