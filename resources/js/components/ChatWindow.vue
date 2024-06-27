@@ -27,20 +27,11 @@
     const userStore = useUserStore();
   
   const props = defineProps(['messages', 'friend']);
-
-//   const messages = ref([
-//     { id: 1, text: 'Hello!', time: '10:00 AM', sender: 'me' },
-//     { id: 2, text: 'Hi! How are you?', time: '10:01 AM', sender: 'other' },
-//   ]);
-
-// console.log('messages => => ', props);
   
   const newMessage = ref('');
   
   const sendMessage = () => {
     if (newMessage.value.trim() !== '') {
-    //   messages.value.push({ id: Date.now(), text: newMessage.value, time: new Date().toLocaleTimeString(), sender: 'me' });
-    //   newMessage.value = '';
         fetch('http://127.0.0.1:8000/api/messages', {
             method: 'POST',
             headers: {
@@ -56,7 +47,6 @@
   
   const messageClass = (message) => {
     console.log('in cls => ', message, userStore.user);
-    // return message.sender_id.id !== userStore.user.id
     return message.sender_id !== userStore.user.id
       ? 'self-end bg-blue-500 text-white p-3 rounded-lg shadow-md'
       : 'self-start bg-gray-300 text-black p-3 rounded-lg shadow-md';

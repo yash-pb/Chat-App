@@ -22,6 +22,11 @@ window.Echo = new Echo({
     key: '42b422186b913915b461', // Replace with your Pusher key
     cluster: 'ap2', // Replace with your Pusher cluster
     encrypted: true,
+    auth: {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}` // Adjust according to your authentication
+        }
+    }
 });
 
 // app.use(axios)

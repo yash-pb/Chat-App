@@ -27,7 +27,6 @@
   const emits = defineEmits(['openUserChatWindow']);
   
   const openUserChat = (friendId) => {
-    // alert(friendId);
     emits('openUserChatWindow', friendId);
   }
   </script>
