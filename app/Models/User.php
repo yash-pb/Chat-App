@@ -45,15 +45,15 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function sender_message()
-    {
-        return $this->hasMany(ChatMessage::class, 'sender_id');
-    }
+    // public function sender_message()
+    // {
+    //     return $this->hasMany(ChatMessage::class, 'sender_id');
+    // }
 
-    public function receiver_message()
-    {
-        return $this->hasMany(ChatMessage::class, 'receiver_id');
-    }
+    // public function receiver_message()
+    // {
+    //     return $this->hasMany(ChatMessage::class, 'receiver_id');
+    // }
 
     // public function friends()
     // {
@@ -62,23 +62,58 @@ class User extends Authenticatable
     //         ->orWhere('receiver_id', $this->id)
     //         ->distinct();
     // }
+    // public function friends()
+    // {
+    //     $userId = $this->id;
+
+    //     // Get distinct friend IDs where the current user is either sender or receiver
+    //     $friendIds = ChatMessage::select(DB::raw('DISTINCT CASE WHEN sender_id = '.$userId.' THEN receiver_id ELSE sender_id END as friend_id', [$userId]))
+    //         ->where('sender_id', $userId)
+    //         ->orWhere('receiver_id', $userId)
+    //         ->pluck('friend_id');
+
+    //     // Return the User models for the friend IDs
+    //     return User::whereIn('id', $friendIds)->get()->toArray();
+    // }
+
     public function friends()
     {
         $userId = $this->id;
 
         // Get distinct friend IDs where the current user is either sender or receiver
-        $friendIds = ChatMessage::select(DB::raw('DISTINCT CASE WHEN sender_id = '.$userId.' THEN receiver_id ELSE sender_id END as friend_id', [$userId]))
-            ->where('sender_id', $userId)
-            ->orWhere('receiver_id', $userId)
+        $friendIds = ChatRoom::select(DB::raw('DISTINCT CASE WHEN user1 = '.$userId.' THEN user2 ELSE user1 END as friend_id', [$userId]))
+            ->where('user1', $userId)
+            ->orWhere('user2', $userId)
             ->pluck('friend_id');
 
         // Return the User models for the friend IDs
         return User::whereIn('id', $friendIds)->get()->toArray();
     }
 
-    public function messages()
-    {
-        return $this->hasMany(ChatMessage::class, 'sender_id')->orWhere('receiver_id', $this->id);
+    // public function messages()
+    // {
+    //     return $this->hasMany(ChatMessage::class, 'sender_id')->orWhere('receiver_id', $this->id);
+    // }
+
+    /**
+     * Get the chat rooms for the user.
+     */
+    public function chatRooms() {
+        return $this->belongsToMany(ChatRoom::class, 'user1');
+    }
+
+    /**
+     * Get the messages sent by the user.
+     */
+    public function sentMessages() {
+        return $this->hasMany(ChatMessage::class, 'sender_id');
+    }
+
+    /**
+     * Get the messages received by the user.
+     */
+    public function receivedMessages() {
+        return $this->hasMany(ChatMessage::class, 'receiver_id');
     }
 
 }

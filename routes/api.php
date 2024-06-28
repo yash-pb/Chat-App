@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\authController;
 use App\Http\Controllers\api\MessageController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 Route::post('/login', [authController::class, 'login']);
 // routes/api.php
-Route::get('/friends', [MessageController::class, 'friends']);
-Route::post('/get-messages', [MessageController::class, 'index']);
-Route::post('/messages', [MessageController::class, 'store']);
+// Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/friends', [MessageController::class, 'friends']);
+    Route::post('/get-messages', [MessageController::class, 'index']);
+    Route::post('/messages', [MessageController::class, 'store']);
+// });
+
+// Route::match(['get','post'], '/broadcasting/auth', function () {
+//     // return Auth::user();
+//     // return uniqid();
+// });
+

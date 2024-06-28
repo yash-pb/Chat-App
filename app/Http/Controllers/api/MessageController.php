@@ -32,49 +32,39 @@ class MessageController extends Controller
     {
         $user = auth('sanctum')->user();
         $friendId = $request->friend_id;
-        // Retrieve messages between the authenticated user and their friend
-        $messages = ChatMessage::where(function ($query) use ($user, $friendId) {
-            $query->where('sender_id', $user->id)
-                ->where('receiver_id', $friendId);
-        })
-        ->orWhere(function ($query) use ($user, $friendId) {
-            $query->where('sender_id', $friendId)
-                ->where('receiver_id', $user->id);
-        })
-        // ->orderBy('created_at')
-        ->get();
-        
-        // Optionally, eager load sender and receiver details
-        // $messages->load('sender_id', 'receiver_id');
 
-        // $groupedMessages = $messages->groupBy(function($message) {
-        //     return Carbon::parse($message->created_at)->format('Y-m-d');
-        // })->toArray();
-        // dd($groupedMessages);
-        // dd($messages->toArray());
-        $room = $this->getRoom($user->id, $friendId);
+        $roomId = ChatRoom::where('room_id', ChatRoom::getRoomId($user->id, $friendId))->first()->id;
+
+        $messages = ChatMessage::where('room_id', $roomId)->get();
+
+        // $room = ChatRoom::getRoomId($user->id, $friendId);
+
         return response()->json([
             'messages' => $messages->toArray(),
             'friend' => User::find($friendId),
-            'room' => $room,
+            'room' => $roomId,
             'status' => true,
         ], 200);
     }
 
     public function store(Request $request)
     {
+        // dd($request);
         $senderId = auth('sanctum')->user()->id;
         $message = ChatMessage::create([
             'sender_id' => $senderId,
             'receiver_id' => $request->receiver_id,
             'text' => $request->message,
+            'room_id' => $request->room_id,
         ]);
 
-        $room = $this->getRoom($senderId, $request->receiver_id);
+        // $room = $this->getRoom($senderId, $request->receiver_id);
 
         // broadcast(new MessageSent($message))->toOthers();
-        event(new MessageSent($message, $room));
         // Broadcast::private('chat.'.$room->room_id)->send();
+        // event(new MessageSent($message, $room));
+        // broadcast(new MessageSent(Auth::user(), $message))->toOthers();
+        broadcast(new MessageSent($message))->toOthers();
 
         return ['status' => 'Message Sent!'];
     }
@@ -99,5 +89,28 @@ class MessageController extends Controller
 
         return $room;
     }
+
+    public function getRoomId($user_id)
+    {
+        // $current_user_id = Auth::user()->id;
+        try {
+            $current_user_id = auth('sanctum')->user()->id;
+            $room_id = ChatRoom::getRoomId($current_user_id, $user_id);
+            
+            if (!$room_id) {
+                $room_id = 'room_' . uniqid();
+                ChatRoom::create([
+                    'room_id' => $room_id,
+                    'user1' => $current_user_id,
+                    'user2' => $user_id,
+                ]);
+            }
+    
+            return response()->json(['room_id' => $room_id]);
+        } catch (\Throwable $th) {
+            dd($th);
+        }
+    }
+
 
 }
