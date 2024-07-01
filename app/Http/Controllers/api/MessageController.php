@@ -8,18 +8,11 @@ use App\Models\ChatMessage;
 use App\Events\MessageSent;
 use App\Models\ChatRoom;
 use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Broadcast;
-use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
 {
 
     public function friends() {
-        // $message = ChatMessage::where('id', 1)->first();
-        // $result = broadcast(new MessageSent($message))->toOthers();
-        // dd($result);
         $user = auth('sanctum')->user();        
         $friends = $user->friends();
 
@@ -57,37 +50,9 @@ class MessageController extends Controller
             'text' => $request->message,
             'room_id' => $request->room_id,
         ]);
+        event(new MessageSent($message));
 
-        // $room = $this->getRoom($senderId, $request->receiver_id);
-
-        // broadcast(new MessageSent($message))->toOthers();
-        // Broadcast::private('chat.'.$room->room_id)->send();
-        // event(new MessageSent($message, $room));
-        // broadcast(new MessageSent(Auth::user(), $message))->toOthers();
-        broadcast(new MessageSent($message))->toOthers();
-
-        return ['status' => 'Message Sent!'];
-    }
-
-    public function getRoom($user1, $user2) {
-        $room = ChatRoom::where([
-            ['user1', $user1],
-            ['user2', $user2]
-    
-            ])->orWhere([
-                ['user1', $user2],
-                ['user2', $user1]
-            ])->first();
-
-        if($room == null){
-            $room = ChatRoom::create([
-                'room_id'=> str()->random(10),
-                'user1'=> $user1,
-                'user2'=> $user2
-            ]);
-        }
-
-        return $room;
+        return ['status' => true, 'message' => $message];
     }
 
     public function getRoomId($user_id)

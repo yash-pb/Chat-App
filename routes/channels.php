@@ -34,20 +34,18 @@ use Illuminate\Support\Facades\Broadcast;
 //   });
 
 
-Broadcast::channel('chat-room.{roomId}', function (User $user, $roomId) {
-  // return true;
-  // Check if the user is part of the chat room
-  $chatRoom = ChatRoom::where('room_id', $roomId)
-              ->where(function ($query) use ($user) {
+Broadcast::channel('chat-room.{roomId}', function (User $user, $friendId) {
+  $chatRoom = ChatRoom::where(function ($query) use ($user, $friendId) {
                   $query->where('user1', $user->id)
-                        ->orWhere('user2', $user->id);
+                        ->orWhere('user2', $friendId);
               })
-              ->orWhere(function ($query) use ($user) {
+              ->orWhere(function ($query) use ($user, $friendId) {
                 $query->where('user2', $user->id)
-                      ->orWhere('user1', $user->id);
+                      ->orWhere('user1', $friendId);
               })
               ->first();
-  // dd($user, $chatRoom);
-  return $chatRoom !== null;
+              
+  if ($user->chatRooms()->room_id == $chatRoom->room_id)
+    return ['id' => $user->id, 'name' => $user->name];
 });
 
