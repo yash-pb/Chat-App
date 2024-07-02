@@ -33,18 +33,27 @@ import Echo from 'laravel-echo';
 import { useUserStore } from "../stores/user";
 
 const userStore = useUserStore();
-const props = defineProps(['messages', 'friend', 'room']);
+const props = defineProps(['messages', 'friend', 'room', 'fetchFriends']);
 const newMessage = ref('');
 const isOnline = ref('');
 const roomId = computed(() => {
-  return props.room;
+  if(props.room) {
+    return props.room;
+  } else {
+    return Math.random().toString(36).slice(2);
+  }
 })
 
 const selectedUserId = computed(() => {
   return props.friend.id;
 })
 
-const listenToRoom = (friendId) => {
+watch(props, async (newprops, oldprops) => {
+  console.log('props => ', newprops);
+});
+
+const listenToRoom = (roomId) => {
+  console.log('listenToRoom roomId => ', roomId);
   const echo = new Echo({
     broadcaster: 'pusher',
     key: '42b422186b913915b461',
@@ -58,7 +67,7 @@ const listenToRoom = (friendId) => {
       },
     },
   });
-  echo.join(`chat-room.${friendId}`)
+  echo.join(`chat-room.${roomId}`)
   .here((users) => {
     isOnline.value = 'Offline';
     users.forEach((user) => {
@@ -83,7 +92,7 @@ const listenToRoom = (friendId) => {
 
 watch(roomId, async (newRoomId, oldRoomId=null) => {
   if (newRoomId) {
-    listenToRoom(roomId.value, oldRoomId);
+    listenToRoom(roomId.value);
   }
 });
 
@@ -96,9 +105,16 @@ const sendMessage = async () => {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
       body: JSON.stringify({ message: newMessage.value, 'receiver_id': selectedUserId.value, room_id: roomId.value }),
-    }).then(() => {
-      newMessage.value = '';
+    }).then((response) => {
+      return response.json();
+    }).then((data) => {
+      if(data.first_msg) {
+        props.messages.push(data.message);
+        listenToRoom(data.message.room_id);
+      }
+      newMessage.value = ''; 
     });
+    props.fetchFriends();
   }
 };
 

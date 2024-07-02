@@ -46,7 +46,6 @@ class ChatRoom extends Model
         })->orWhere(function($query) use ($user1, $user2) {
             $query->where('user1', $user2)->where('user2', $user1);
         })->first();
-
         if ($room) {
             return $room->room_id;
         }

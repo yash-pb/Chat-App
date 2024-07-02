@@ -23,62 +23,65 @@ class MessageController extends Controller
     }
     public function index(Request $request)
     {
-        $user = auth('sanctum')->user();
-        $friendId = $request->friend_id;
-
-        $roomId = ChatRoom::where('room_id', ChatRoom::getRoomId($user->id, $friendId))->first()->id;
-
-        $messages = ChatMessage::where('room_id', $roomId)->get();
-
-        // $room = ChatRoom::getRoomId($user->id, $friendId);
-
-        return response()->json([
-            'messages' => $messages->toArray(),
-            'friend' => User::find($friendId),
-            'room' => $roomId,
-            'status' => true,
-        ], 200);
-    }
-
-    public function store(Request $request)
-    {
-        // dd($request);
-        $senderId = auth('sanctum')->user()->id;
-        $message = ChatMessage::create([
-            'sender_id' => $senderId,
-            'receiver_id' => $request->receiver_id,
-            'text' => $request->message,
-            'room_id' => $request->room_id,
-        ]);
-        event(new MessageSent($message));
-
-        return ['status' => true, 'message' => $message];
-    }
-
-    public function getRoomId($user_id)
-    {
-        // $current_user_id = Auth::user()->id;
         try {
-            $current_user_id = auth('sanctum')->user()->id;
-            $room_id = ChatRoom::getRoomId($current_user_id, $user_id);
-            
-            if (!$room_id) {
-                $room_id = 'room_' . uniqid();
-                ChatRoom::create([
-                    'room_id' => $room_id,
-                    'user1' => $current_user_id,
-                    'user2' => $user_id,
-                ]);
+            $user = auth('sanctum')->user();
+            $friendId = $request->friend_id;
+            $roomId = null;
+            $messages = [];
+
+            $roomId = ChatRoom::getRoomId($user->id, $friendId);
+            if(!empty($roomId)) {
+                $messages = ChatMessage::where('room_id', $roomId)->get()->toArray();
             }
-    
-            return response()->json(['room_id' => $room_id]);
+
+            return response()->json([
+                'messages' => $messages,
+                'friend' => User::find($friendId),
+                'room' => $roomId,
+                'status' => true,
+            ], 200);
         } catch (\Throwable $th) {
             dd($th);
         }
     }
 
+    public function store(Request $request)
+    {
+        // dd($request);
+        $room_id = $request->room_id;
+        $senderId = auth('sanctum')->user()->id;
+        $firstMsg = false;
+        if(!ChatRoom::where('room_id', $room_id)->exists()) {
+            ChatRoom::create([
+                'room_id' => $room_id,
+                'user1' => $senderId,
+                'user2' => $request->receiver_id,
+            ]);
+            $firstMsg = true;
+        }
+        // if($request->room_id == null) {
+        //     $room_id = uniqid();
+        //     ChatRoom::create([
+        //         'room_id' => $room_id,
+        //         'user1' => $senderId,
+        //         'user2' => $request->receiver_id,
+        //     ]);
+        // }
+        $message = ChatMessage::create([
+            'sender_id' => $senderId,
+            'receiver_id' => $request->receiver_id,
+            'text' => $request->message,
+            'room_id' => $room_id,
+        ]);
+        event(new MessageSent($message));
+
+        return ['status' => true, 'message' => $message, 'first_msg' => $firstMsg];
+    }
+
     public function searchUser(Request $request) {
-        $users = User::where('name', 'LIKE', '%'. $request->search .'%')->where('id', '!=', auth('sanctum')->user()->id)->get();
+        $users = [];
+        if($request->search != null || $request->search != '')
+            $users = User::where('name', 'LIKE', '%'. $request->search .'%')->where('id', '!=', auth('sanctum')->user()->id)->get();
         return response()->json(['users' => $users, 'status' => true]);
     }
 

@@ -1,7 +1,7 @@
 <template>
     <div class="flex h-screen">
         <Sidebar :friends="friends" @openUserChatWindow="handleOpenUserChatWindow" />
-        <ChatWindow :messages="messages" :friend="friend" :room="room" />
+        <ChatWindow :messages="messages" :friend="friend" :room="room" :fetchFriends="fetchFriends" />
     </div>
 </template>
 <script setup>
@@ -15,7 +15,11 @@ const friend = ref({});
 const room = ref({});
 
 onMounted(() => {
-    fetch('http://127.0.0.1:8000/api/friends', {
+    fetchFriends();
+});
+
+const fetchFriends = async() => {
+    await fetch('http://127.0.0.1:8000/api/friends', {
         headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -24,7 +28,7 @@ onMounted(() => {
     .then(data => {
         friends.value = data.friends;
     });
-});
+}
 
 const friendFetchMsg = (friendId) => {
     fetch('http://127.0.0.1:8000/api/get-messages', {
