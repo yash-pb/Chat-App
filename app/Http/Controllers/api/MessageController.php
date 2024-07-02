@@ -77,5 +77,9 @@ class MessageController extends Controller
         }
     }
 
+    public function searchUser(Request $request) {
+        $users = User::where('name', 'LIKE', '%'. $request->search .'%')->where('id', '!=', auth('sanctum')->user()->id)->get();
+        return response()->json(['users' => $users, 'status' => true]);
+    }
 
 }

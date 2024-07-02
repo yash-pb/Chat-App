@@ -1,8 +1,13 @@
 <template>
     <div class="w-1/4 bg-gray-900 text-white flex flex-col">
       <div class="p-4 flex items-center justify-between bg-gray-800">
-        <h1 class="text-xl font-bold">{{ userStore.user.name }}</h1>
-        <button class="text-gray-400 hover:text-white">
+        <h1 class="text-xl font-bold">
+          <input @keyup.enter="searchUsers" v-if="isSearchVisible" class="text-gray-900 w-56 text-base" type="text" name="search" id="search" placeholder="Search User" v-model="searchUser">
+          <span v-else>
+            {{ userStore.user.name }}
+          </span>
+        </h1>
+        <button @click="searchToggle" class="text-gray-400 hover:text-white">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -27,9 +32,29 @@
   const props = defineProps(['friends']);
   const emits = defineEmits(['openUserChatWindow']);
   const userStore = useUserStore();
+  const searchUser = ref('');
+  const isSearchVisible = ref(false);
+  const searchResult = ref([]);
   
   const openUserChat = (friendId) => {
     emits('openUserChatWindow', friendId);
   }
+
+  const searchToggle = () => {
+    isSearchVisible.value = !isSearchVisible.value;
+  }
+
+  const searchUsers = () => {
+    fetch(`http://127.0.0.1:8000/api/search-user?search=${searchUser.value}`, {
+        headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('data => ', data);
+      searchResult.value = data.users;
+      console.log('searchResult => ', searchResult);
+    });
+  }
   </script>
-  
