@@ -19,6 +19,7 @@ onMounted(() => {
 });
 
 const fetchFriends = async() => {
+    console.log('call fetchFriends');
     await fetch('http://127.0.0.1:8000/api/friends', {
         headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`

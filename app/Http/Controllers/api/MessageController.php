@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ChatMessage;
 use App\Events\MessageSent;
+use App\Events\NewFriend;
 use App\Models\ChatRoom;
 use App\Models\User;
 
@@ -73,6 +74,7 @@ class MessageController extends Controller
             'text' => $request->message,
             'room_id' => $room_id,
         ]);
+        event(new NewFriend($message, $firstMsg));
         event(new MessageSent($message));
 
         return ['status' => true, 'message' => $message, 'first_msg' => $firstMsg];

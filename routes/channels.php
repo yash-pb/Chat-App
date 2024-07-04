@@ -49,3 +49,9 @@ Broadcast::channel('chat-room.{roomId}', function (User $user, $friendId) {
     return ['id' => $user->id, 'name' => $user->name];
 });
 
+
+Broadcast::channel('new-friend.{id}', function ($user, $userId) {
+  // return true;
+  // dd($user, $userId);
+  return $user->id == $userId;
+});

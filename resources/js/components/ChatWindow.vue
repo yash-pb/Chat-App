@@ -87,6 +87,37 @@ const listenToRoom = (roomId) => {
   })
   .listen('.chat-room', (e) => {
     props.messages.push(e.message);
+    var height = document.getElementById('auto-scroll').offsetHeight;
+    document.getElementById('auto-scroll').scrollTo('', (height*3));
+  });
+};
+
+
+onMounted(() => {
+  listenPrivateChannel();
+})
+
+const listenPrivateChannel = () => {
+  const echo = new Echo({
+    broadcaster: 'pusher',
+    key: '42b422186b913915b461',
+    authEndpoint: '/broadcasting/auth',
+    cluster: 'ap2',
+    encrypted: true,
+    auth: {
+      headers: {
+        'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content,
+        Authorization: 'Bearer ' + localStorage.getItem('token'),
+      },
+    },
+  });
+  echo.private(`new-friend.${userStore.user.id}`)
+  .listen('.new-friend', (e) => {
+    // console.log('private e => ', e);
+    if(e.firstMsg) {
+      props.fetchFriends();
+    }
+    // props.messages.push(e.message);
   });
 };
 

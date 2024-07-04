@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\authController;
 use App\Http\Controllers\api\MessageController;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,8 +30,10 @@ Route::post('/login', [authController::class, 'login']);
     Route::post('/messages', [MessageController::class, 'store']);
 // });
 
-// Route::match(['get','post'], '/broadcasting/auth', function () {
-//     // return Auth::user();
-//     // return uniqid();
-// });
+Route::match(['get','post'], '/broadcasting/auth', function (User $user) {
+    // dd(Auth::user());
+    // return true;
+    return Auth::user();
+    // return uniqid();
+});
 
