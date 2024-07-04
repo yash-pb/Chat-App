@@ -35,11 +35,31 @@ export const useUserStore = defineStore("user", () => {
         // .finally(() => this.loading = false)
     }
 
+    const logout = async() => {
+        axios
+        .get('logout', {
+            headers: {
+                'Authorization': `Bearer ${token.value}`
+            }
+        })
+        .then(async (response) => {
+            if(response.status) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                return true
+            }
+            return false
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+    }
+
     return {
         token,
         user,
         setDatas,
-        checkLogin
-        // fetchUser
+        checkLogin,
+        logout
     }
 })

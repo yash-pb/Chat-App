@@ -5,7 +5,7 @@
         <h2 class="text-xl font-bold">{{ friend.name ?? 'Chat' }}</h2>
         <span class="text-xs">{{ isOnline }}</span>
       </div>
-      <button class="text-gray-400 hover:text-white">
+      <button class="text-gray-400 hover:text-white" @click="doLogout">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 12h12M6 12l6 6m-6-6l6-6" />
         </svg>
@@ -31,7 +31,9 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import Echo from 'laravel-echo';
 import { useUserStore } from "../stores/user";
+import { useRoute, useRouter } from 'vue-router'
 
+const router = useRouter()
 const userStore = useUserStore();
 const props = defineProps(['messages', 'friend', 'room', 'fetchFriends']);
 const newMessage = ref('');
@@ -63,7 +65,7 @@ const listenToRoom = (roomId) => {
     auth: {
       headers: {
         'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content,
-        Authorization: 'Bearer ' + localStorage.getItem('token'),
+        Authorization: `Bearer ${userStore.token}`
       },
     },
   });
@@ -107,7 +109,7 @@ const listenPrivateChannel = () => {
     auth: {
       headers: {
         'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content,
-        Authorization: 'Bearer ' + localStorage.getItem('token'),
+        Authorization: `Bearer ${userStore.token}`
       },
     },
   });
@@ -133,7 +135,7 @@ const sendMessage = async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${userStore.token}`
       },
       body: JSON.stringify({ message: newMessage.value, 'receiver_id': selectedUserId.value, room_id: roomId.value }),
     }).then((response) => {
@@ -168,5 +170,12 @@ const formatTimestamp = (timestamp) => {
   const minutes = String(date.getMinutes()).padStart(2, '0');
 
   return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
+const doLogout = () => {
+  let result = userStore.logout();
+  if(result) {
+      router.push({ name: 'login' });
+  }
 }
 </script>

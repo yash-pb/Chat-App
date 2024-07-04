@@ -20,20 +20,6 @@ use Illuminate\Support\Facades\Broadcast;
 // Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 //     return (int) $user->id === (int) $id;
 // });
-
-
-// routes/channels.php
-
-// Broadcast::channel('chat', function (Request $request, $user, $roomId) {
-//   dd($request, $user, $roomId);
-//   // if($roomId) {
-//   //   // return Auth::check();
-//   // }
-//   return true;
-//     // dd($user);
-//   });
-
-
 Broadcast::channel('chat-room.{roomId}', function (User $user, $friendId) {
   $chatRoom = ChatRoom::where(function ($query) use ($user, $friendId) {
                   $query->where('user1', $user->id)
@@ -51,7 +37,5 @@ Broadcast::channel('chat-room.{roomId}', function (User $user, $friendId) {
 
 
 Broadcast::channel('new-friend.{id}', function ($user, $userId) {
-  // return true;
-  // dd($user, $userId);
   return $user->id == $userId;
 });

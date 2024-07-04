@@ -48,7 +48,6 @@ class MessageController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request);
         $room_id = $request->room_id;
         $senderId = auth('sanctum')->user()->id;
         $firstMsg = false;
@@ -60,14 +59,7 @@ class MessageController extends Controller
             ]);
             $firstMsg = true;
         }
-        // if($request->room_id == null) {
-        //     $room_id = uniqid();
-        //     ChatRoom::create([
-        //         'room_id' => $room_id,
-        //         'user1' => $senderId,
-        //         'user2' => $request->receiver_id,
-        //     ]);
-        // }
+
         $message = ChatMessage::create([
             'sender_id' => $senderId,
             'receiver_id' => $request->receiver_id,

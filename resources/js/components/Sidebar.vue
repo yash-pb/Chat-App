@@ -73,7 +73,7 @@
   const searchUsers = () => {
     fetch(`http://127.0.0.1:8000/api/search-user?search=${searchUser.value}`, {
         headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${userStore.token}`
         }
     })
     .then(response => response.json())

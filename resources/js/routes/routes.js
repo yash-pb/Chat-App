@@ -33,38 +33,6 @@ const routes = [
                 name: 'chat', 
                 component: Chat
             },
-            // {
-            //     path: 'users',
-            //     name: 'users', 
-            //     component: Users
-            // },
-            // {
-            //     path: 'users/create',
-            //     name: 'user.create', 
-            //     component: UserCreate
-            // },
-            // {
-            //     path: 'users/edit/:id',
-            //     name: 'user.edit', 
-            //     component: UserEdit,
-            //     props: true
-            // },
-            // {
-            //     path: 'books',
-            //     name: 'books', 
-            //     component: Books
-            // },
-            // {
-            //     path: 'books/create',
-            //     name: 'book.create', 
-            //     component: BookCreate
-            // },
-            // {
-            //     path: 'books/edit/:id',
-            //     name: 'book.edit', 
-            //     component: BookEdit,
-            //     props: true
-            // },
         ]
     }   
 ];

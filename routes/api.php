@@ -23,17 +23,26 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 Route::post('/login', [authController::class, 'login']);
 // routes/api.php
-// Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('/search-user', [MessageController::class, 'searchUser']);
     Route::get('/friends', [MessageController::class, 'friends']);
     Route::post('/get-messages', [MessageController::class, 'index']);
     Route::post('/messages', [MessageController::class, 'store']);
-// });
+    Route::get('/logout', function(Request $request) {
+        if(Auth::check()) {
+            $request->user()->currentAccessToken()->delete();
+            // Auth::logout();
+            return response()->json([
+                'status' => true,
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+        ]);
+    });
+});
 
 Route::match(['get','post'], '/broadcasting/auth', function (User $user) {
-    // dd(Auth::user());
-    // return true;
     return Auth::user();
-    // return uniqid();
 });
 

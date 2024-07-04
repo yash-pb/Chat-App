@@ -8,11 +8,13 @@
 import Sidebar from '../components/Sidebar.vue'
 import ChatWindow from '../components/ChatWindow.vue'
 import { ref, onMounted } from 'vue';
+import { useUserStore } from "../stores/user";
 
 const messages = ref([]);
 const friends = ref([]);
 const friend = ref({});
 const room = ref({});
+const userStore = useUserStore();
 
 onMounted(() => {
     fetchFriends();
@@ -22,7 +24,7 @@ const fetchFriends = async() => {
     console.log('call fetchFriends');
     await fetch('http://127.0.0.1:8000/api/friends', {
         headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${userStore.token}`
         }
     })
     .then(response => response.json())
@@ -36,7 +38,7 @@ const friendFetchMsg = (friendId) => {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${userStore.token}`
         },
         body: JSON.stringify({ 'friend_id': friendId }),
     })

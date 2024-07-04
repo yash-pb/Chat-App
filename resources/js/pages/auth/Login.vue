@@ -46,23 +46,10 @@ import { useRoute, useRouter } from 'vue-router'
 
 const router = useRouter()
 const userStore = useUserStore();
-// export default {
-//     name:"login",
-//     data() {
-//         return {
-//             credentials: {},
-//             message: ''
-//         }
-//     },
-//     methods: {
-//         async checkLogin() {
-//             userStore.checkLogin(this.credentials);
-//         }
-//     }
-// }
+
 const credentials = ref({});
 const message = ref('');
-const checkLogin = () => {
+const checkLogin = async () => {
     let result = userStore.checkLogin(credentials.value);
     if(result) {
         router.push({ name: 'chat' });
